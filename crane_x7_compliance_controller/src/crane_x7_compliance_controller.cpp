@@ -34,7 +34,8 @@ CraneX7ComplianceController::CraneX7ComplianceController()
   data_ = pinocchio::Data(model_);
   fjoint_ = pinocchio::container::aligned_vector<pinocchio::Force>(
                 model_.joints.size(), pinocchio::Force::Zero());
-  u_max_ << 5.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0;
+  u_max_ << 10.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0; // This is from URDF
+  u_max_.array() *= 0.5;
   q_goal_ << 0., 0.3979, 0., -2.1994, 0.0563, 0.4817, 0.;
   Kq_ = 1.0 * Matrix7d::Identity();
   Kv_ = 0.1 * Matrix7d::Identity();
@@ -88,6 +89,14 @@ void CraneX7ComplianceController::update(const ros::Time& time,
   Kv_.noalias() = J3.transpose() * Kvee_ * J3;
   u_.noalias() -= Kq_ * (q_ - q_goal_);
   u_.noalias() -= Kv_ * v_;
+  for (int i=0; i<7; ++i) {
+    if (u_.coeff(i) > u_max_.coeff(i)) {
+      u_.coeffRef(i) = u_max_.coeff(i);
+    }
+    else if (u_.coeff(i) < - u_max_.coeff(i)) {
+      u_.coeffRef(i) = - u_max_.coeff(i);
+    }
+  }
   for (int i=0; i<7; ++i) {
     joint_handlers_[i].setCommand(u_.coeff(i));
   }

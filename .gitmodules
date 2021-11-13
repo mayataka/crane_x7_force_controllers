@@ -1,3 +1,0 @@
-[submodule "crane_x7_ros"]
-	path = crane_x7_ros
-	url = https://github.com/rt-net/crane_x7_ros
