@@ -25,7 +25,7 @@ CraneX7JointStiffnessController::CraneX7JointStiffnessController()
     Kq_(Matrix7d::Zero()),
     Kv_(Matrix7d::Zero()) {
   const std::string path_to_urdf 
-      = ros::package::getPath("crane_x7_force_controllers") + "/urdf/crane_x7.urdf";
+      = ros::package::getPath("crane_x7_joint_stiffness_controller") + "/urdf/crane_x7.urdf";
   pinocchio::urdf::buildModel(path_to_urdf, model_);
   data_ = pinocchio::Data(model_);
   fjoint_ = pinocchio::container::aligned_vector<pinocchio::Force>(

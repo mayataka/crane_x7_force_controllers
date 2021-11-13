@@ -1,0 +1,33 @@
+<launch>
+  <!-- USB port name for dynamixel_port -->
+  <arg name="port" default="/dev/ttyUSB0" />
+
+  <arg name="use_effort_gripper" default="false" />
+  <param name="robot_description"
+    command="$(find xacro)/xacro --inorder '$(find crane_x7_description)/urdf/crane_x7.urdf.xacro'"
+    />
+  <group ns="crane_x7">
+    <rosparam file="$(find crane_x7_control)/config/crane_x7_control.yaml" command="load"/>
+    <param name="dynamixel_port/port_name" value="$(arg port)"/>
+
+    <node name="crane_x7_differential_ik" pkg="crane_x7_planners" type="crane_x7_differential_ik" 
+          output="screen" respawn="false"/>
+
+    <node name="crane_x7_control" pkg="crane_x7_control" type="crane_x7_control" output="screen" respawn="false"/>
+    <rosparam file="$(find crane_x7_joint_stiffness_controller)/config/crane_x7_joint_stiffness_controller.yaml" command="load"/>
+
+    <node name="controller_manager"
+        pkg="controller_manager"
+        type="spawner" respawn="false"
+        output="screen"
+        args="joint_state_controller
+              joint_stiffness_controller
+              gripper_controller">
+    </node>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" 
+        type="robot_state_publisher" respawn="false" output="screen">
+      <remap from="/joint_states" to="/crane_x7/joint_states"/>
+    </node>
+  </group>
+</launch>

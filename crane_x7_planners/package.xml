@@ -11,8 +11,10 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>roslib</build_depend>
-  <build_depend>crane_x7_force_controllers_msgs</build_depend>
+  <build_depend>crane_x7_joint_stiffness_controller</build_depend>
+  <build_depend>crane_x7_compliance_controller</build_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>roslib</run_depend>
-  <run_depend>crane_x7_force_controllers_msgs</run_depend>
+  <run_depend>crane_x7_joint_stiffness_controller</run_depend>
+  <run_depend>crane_x7_compliance_controller</run_depend>
 </package>

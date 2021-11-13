@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(crane_x7_force_controllers)
+project(crane_x7_compliance_controller)
 set(CMAKE_CXX_STANDARD 11)
 
 find_package(Eigen3 REQUIRED)
@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-  LIBRARIES crane_x7_force_controllers
+  LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS 
   roscpp 
   roslib
@@ -24,7 +24,6 @@ catkin_package(
 
 add_library(
   ${PROJECT_NAME} 
-  src/crane_x7_joint_stiffness_controller.cpp
   src/crane_x7_compliance_controller.cpp
 )
 target_include_directories(
@@ -42,12 +41,11 @@ target_link_libraries(
   ${PINOCCHIO_LIBRARIES}
   ${catkin_LIBRARIES}
 )
-
 if(catkin_EXPORTED_LIBRARIES)
   add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_LIBRARIES})
 endif()
 
-foreach(dir urdf)
+foreach(dir config urdf)
   install(DIRECTORY ${dir}/ 
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir}
   )

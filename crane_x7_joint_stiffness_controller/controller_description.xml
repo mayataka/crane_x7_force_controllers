@@ -1,0 +1,7 @@
+<library path="lib/libcrane_x7_joint_stiffness_controller">
+    <class name="crane_x7_ros/CraneX7JointStiffnessController" type="crane_x7_ros::CraneX7JointStiffnessController"
+    base_class_type="controller_interface::ControllerBase">
+    <description>
+    </description>
+  </class>
+</library>

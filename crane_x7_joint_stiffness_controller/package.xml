@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>crane_x7_force_controllers</name>
+  <name>crane_x7_joint_stiffness_controller</name>
   <version>0.0.0</version>
   <description>The CRANE-X7 force controllers package</description>
 

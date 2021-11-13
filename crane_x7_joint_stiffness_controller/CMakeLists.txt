@@ -1,14 +1,16 @@
-cmake_minimum_required(VERSION 3.0.2)
-project(crane_x7_planners)
+cmake_minimum_required(VERSION 2.8.3)
+project(crane_x7_joint_stiffness_controller)
 set(CMAKE_CXX_STANDARD 11)
 
 find_package(Eigen3 REQUIRED)
 find_package(pinocchio REQUIRED)
 
+## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   roslib
-  std_msgs
+  controller_interface
+  hardware_interface
   crane_x7_force_controllers_msgs
 )
 
@@ -17,15 +19,16 @@ catkin_package(
   CATKIN_DEPENDS 
   roscpp 
   roslib
+  controller_interface 
 )
 
-add_executable(
-  crane_x7_differential_ik
-  src/crane_x7_differential_ik.cpp
+add_library(
+  ${PROJECT_NAME} 
+  src/crane_x7_joint_stiffness_controller.cpp
 )
 target_include_directories(
-  crane_x7_differential_ik
-  PUBLIC
+  ${PROJECT_NAME} 
+  PRIVATE
   include/${PROJECT_NAME}
   ${EIGEN3_INCLUDE_DIR}
   ${PINOCCHIO_INCLUDE_DIRS}
@@ -33,23 +36,16 @@ target_include_directories(
   ${CRANE_X7_FORCE_CONTROLLERS_MSGS_INCLUDE_DIR}
 )
 target_link_libraries(
-  crane_x7_differential_ik
+  ${PROJECT_NAME} 
   PUBLIC
   ${PINOCCHIO_LIBRARIES}
   ${catkin_LIBRARIES}
 )
+if(catkin_EXPORTED_LIBRARIES)
+  add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_LIBRARIES})
+endif()
 
-install(TARGETS crane_x7_differential_ik
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE
-)
-
-foreach(dir launch urdf)
+foreach(dir config urdf)
   install(DIRECTORY ${dir}/ 
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir}
   )
