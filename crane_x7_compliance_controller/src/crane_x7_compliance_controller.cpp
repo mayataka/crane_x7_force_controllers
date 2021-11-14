@@ -43,13 +43,13 @@ CraneX7ComplianceController::CraneX7ComplianceController()
                 model_.joints.size(), pinocchio::Force::Zero());
   u_max_ << 10.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0; // This is from URDF
   q_goal_ << 0., 0.3979, 0., -2.1994, 0.0563, 0.4817, 0.;
-  Kqee_ = 100.0 * Matrix3d::Identity(); // P
-  Kvee_ = 50.0 * Matrix3d::Identity(); // D
-  Kiee_ = 1.0 * Matrix3d::Identity(); // I
+  Kqee_ = 10.0 * Matrix3d::Identity(); // P
+  Kvee_ = 1.0 * Matrix3d::Identity(); // D
+  // Kiee_ = 1.0 * Matrix3d::Identity(); // I
   Kq0_ = 0.0 * Matrix7d::Identity(); // P
   Kv0_ = 0.1 * Matrix7d::Identity(); // D
-  Ki0_ = 0.0  * Matrix7d::Identity(); // I
-  qi_max_ << 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0; // anti-windup
+  Ki0_ = 0.01  * Matrix7d::Identity(); // I
+  qi_max_ << 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0; // anti-windup
 }
 
 

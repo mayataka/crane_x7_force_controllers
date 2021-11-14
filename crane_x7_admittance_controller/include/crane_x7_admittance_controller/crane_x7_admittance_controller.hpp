@@ -66,10 +66,11 @@ private:
     return current_unit * current * effort_const * 0.001;
   }
 
-  Vector7d q_, v_, qi_, qi_max_, effort_, u_, u_max_, q_goal_;
+  Vector7d q_, v_, qi_, qi_max_, effort_, effort_bias_, ext_effort_, a_, u_, u_max_, q_goal_;
   Matrix7d Kq_, Kv_, Ki_, Kq0_, Kv0_, Ki0_; // joint stiffness
-  Matrix3d Kqee_, Kvee_, Kiee_; // end-effector stiffness
-  Matrix67d J_;
+  Vector3d f_, xq_, xv_, xa_;
+  Matrix3d Minv_, B_; // virtual mass-spring stiffness
+  Matrix67d J_, dJ_;
 };
 
 } // namespace crane_x7_ros
