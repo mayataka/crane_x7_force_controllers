@@ -1,0 +1,7 @@
+<library path="lib/libcrane_x7_admittance_controller">
+  <class name="crane_x7_ros/CraneX7AdmittanceController" type="crane_x7_ros::CraneX7AdmittanceController"
+    base_class_type="controller_interface::ControllerBase">
+    <description>
+    </description>
+  </class>
+</library>
