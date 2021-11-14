@@ -8,7 +8,7 @@
   <arg name="headless" default="false"/>
 
   <!-- Change the controller type of gripper from position to effort -->
-  <arg name="use_effort_gripper" default="false" />
+  <arg name="use_effort_gripper" default="true" />
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find crane_x7_gazebo)/worlds/table.world"/>
@@ -27,8 +27,8 @@
 
   <group ns="/crane_x7">
     <rosparam file="$(find crane_x7_control)/config/crane_x7_gazebo_control.yaml" command="load"/>
-    <rosparam file="$(find crane_x7_control)/config/crane_x7_fake_control.yaml" command="load"/>
-    <rosparam file="$(find crane_x7_joint_stiffness_controller)/config/crane_x7_joint_stiffness_controller.yaml" command="load"/>
+    <rosparam file="$(find crane_x7_planners)/config/crane_x7_fake_force_controllers.yaml" command="load"/>
+    <rosparam file="$(find crane_x7_compliance_controller)/config/crane_x7_compliance_controller.yaml" command="load"/>
 
     <param if="$(arg use_effort_gripper)" name="gripper_controller/type" value="effort_controllers/GripperActionController" />
     <node name="crane_x7_differential_ik" pkg="crane_x7_planners" type="crane_x7_differential_ik" 
@@ -40,7 +40,7 @@
           respawn="false"
           output="screen"
           args="joint_state_controller
-                joint_stiffness_controller
+                compliance_controller
                 gripper_controller"/>
   </group>
 

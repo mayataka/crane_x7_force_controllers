@@ -2,18 +2,18 @@
   <!-- USB port name for dynamixel_port -->
   <arg name="port" default="/dev/ttyUSB0" />
 
-  <arg name="use_effort_gripper" default="false" />
+  <arg name="use_effort_gripper" default="true" />
   <param name="robot_description"
     command="$(find xacro)/xacro --inorder '$(find crane_x7_description)/urdf/crane_x7.urdf.xacro'"
     />
   <group ns="crane_x7">
-    <rosparam file="$(find crane_x7_control)/config/crane_x7_control.yaml" command="load"/>
     <param name="dynamixel_port/port_name" value="$(arg port)"/>
 
     <node name="crane_x7_differential_ik" pkg="crane_x7_planners" type="crane_x7_differential_ik" 
           output="screen" respawn="false"/>
 
     <node name="crane_x7_control" pkg="crane_x7_control" type="crane_x7_control" output="screen" respawn="false"/>
+    <rosparam file="$(find crane_x7_planners)/config/crane_x7_force_controllers.yaml" command="load"/>
     <rosparam file="$(find crane_x7_joint_stiffness_controller)/config/crane_x7_joint_stiffness_controller.yaml" command="load"/>
 
     <node name="controller_manager"

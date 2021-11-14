@@ -1,0 +1,52 @@
+<launch>
+
+  <!-- Gazebo configurations-->
+  <arg name="gazebo_debug" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="headless" default="false"/>
+
+  <!-- Change the controller type of gripper from position to effort -->
+  <arg name="use_effort_gripper" default="true" />
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find crane_x7_gazebo)/worlds/table.world"/>
+    <arg name="debug" value="$(arg gazebo_debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+
+  <param name="robot_description"
+    command="$(find xacro)/xacro --inorder '$(find crane_x7_description)/urdf/crane_x7.urdf.xacro'"
+    />
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+        args="-urdf -model crane_x7 -param robot_description -z 1.02"/>
+
+  <group ns="/crane_x7">
+    <rosparam file="$(find crane_x7_control)/config/crane_x7_gazebo_control.yaml" command="load"/>
+    <rosparam file="$(find crane_x7_planners)/config/crane_x7_fake_force_controllers.yaml" command="load"/>
+    <rosparam file="$(find crane_x7_inverse_dynamics_controller)/config/crane_x7_inverse_dynamics_controller.yaml" command="load"/>
+
+    <param if="$(arg use_effort_gripper)" name="gripper_controller/type" value="effort_controllers/GripperActionController" />
+    <node name="crane_x7_differential_ik" pkg="crane_x7_planners" type="crane_x7_differential_ik" 
+          output="screen" respawn="false"/>
+
+    <node name="controller_spawner"
+          pkg="controller_manager"
+          type="spawner" 
+          respawn="false"
+          output="screen"
+          args="joint_state_controller
+                inverse_dynamics_controller 
+                gripper_controller"/>
+  </group>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" 
+      type="robot_state_publisher" respawn="false" output="screen">
+    <remap from="/joint_states" to="/crane_x7/joint_states" />
+  </node>
+
+</launch>

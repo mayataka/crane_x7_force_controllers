@@ -23,7 +23,9 @@ namespace crane_x7_ros {
 
 class CraneX7ComplianceController : public controller_interface::Controller<hardware_interface::EffortJointInterface> {
 public:
+  using Vector3d = Eigen::Matrix<double, 3, 1>;
   using Vector7d = Eigen::Matrix<double, 7, 1>;
+  using Matrix3d = Eigen::Matrix<double, 3, 3>;
   using Matrix7d = Eigen::Matrix<double, 7, 7>;
   using Matrix67d = Eigen::Matrix<double, 6, 7>;
 
@@ -45,9 +47,9 @@ private:
   pinocchio::container::aligned_vector<pinocchio::Force> fjoint_;
   int end_effector_frame_;
 
-  Vector7d q_, v_, u_, u_max_, q_goal_;
-  Matrix7d Kq_, Kv_; // joint stiffness
-  Eigen::Matrix3d Kqee_, Kvee_;
+  Vector7d q_, v_, qi_, qi_max_, u_, u_max_, q_goal_;
+  Matrix7d Kq_, Kv_, Ki_, Kq0_, Kv0_, Ki0_; // joint stiffness
+  Matrix3d Kqee_, Kvee_, Kiee_; // end-effector stiffness
   Matrix67d J_;
 };
 

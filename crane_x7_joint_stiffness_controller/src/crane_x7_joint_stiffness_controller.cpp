@@ -17,13 +17,13 @@ CraneX7JointStiffnessController::CraneX7JointStiffnessController()
   : model_(),
     data_(),
     fjoint_(),
-    q_(Vector7d::Zero()),
-    v_(Vector7d::Zero()),
+    q_(Vector7d::Zero()), 
+    v_(Vector7d::Zero()), 
+    qi_(Vector7d::Zero()),
+    qi_max_(Vector7d::Zero()),
     u_(Vector7d::Zero()),
     u_max_(Vector7d::Zero()),
-    q_goal_(Vector7d::Zero()),
-    Kq_(Matrix7d::Zero()),
-    Kv_(Matrix7d::Zero()) {
+    q_goal_(Vector7d::Zero()) {
   const std::string path_to_urdf 
       = ros::package::getPath("crane_x7_joint_stiffness_controller") + "/urdf/crane_x7.urdf";
   pinocchio::urdf::buildModel(path_to_urdf, model_);
@@ -31,10 +31,11 @@ CraneX7JointStiffnessController::CraneX7JointStiffnessController()
   fjoint_ = pinocchio::container::aligned_vector<pinocchio::Force>(
                 model_.joints.size(), pinocchio::Force::Zero());
   u_max_ << 10.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0; // This is from URDF
-  u_max_.array() *= 0.5;
   q_goal_ << 0., 0.3979, 0., -2.1994, 0.0563, 0.4817, 0.;
-  Kq_ = 1.0 * Matrix7d::Identity();
-  Kv_ = 0.1 * Matrix7d::Identity();
+  Kq_ = 1.0 * Matrix7d::Identity(); // P
+  Kv_ = 0.25 * Matrix7d::Identity(); // D
+  Ki_ = 0.1  * Matrix7d::Identity(); // I
+  qi_max_ << 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0; // anti-windup
 }
 
 
@@ -76,10 +77,22 @@ void CraneX7JointStiffnessController::update(const ros::Time& time,
     q_.coeffRef(i) = joint_handlers_[i].getPosition();
     v_.coeffRef(i) = joint_handlers_[i].getVelocity();
   }
+  qi_.noalias() +=  (q_ - q_goal_);
+  // anti-windup
+  for (int i=0; i<7; ++i) {
+    if (qi_.coeff(i) > qi_max_.coeff(i)) {
+      qi_.coeffRef(i) = qi_max_.coeff(i);
+    }
+    else if (qi_.coeff(i) < - qi_max_.coeff(i)) {
+      qi_.coeffRef(i) = - qi_max_.coeff(i);
+    }
+  }
   pinocchio::computeStaticTorque(model_, data_, q_, fjoint_);
   u_ = data_.tau; // gravity compensation
-  u_.noalias() -= Kq_ * (q_ - q_goal_);
-  u_.noalias() -= Kv_ * v_;
+  u_.noalias() -= Kq_ * (q_ - q_goal_); // P
+  u_.noalias() -= Kv_ * v_; // D
+  u_.noalias() -= Ki_ * qi_; // I
+  // saturation
   for (int i=0; i<7; ++i) {
     if (u_.coeff(i) > u_max_.coeff(i)) {
       u_.coeffRef(i) = u_max_.coeff(i);

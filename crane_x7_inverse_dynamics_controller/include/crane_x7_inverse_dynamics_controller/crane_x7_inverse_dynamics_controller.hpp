@@ -1,5 +1,5 @@
-#ifndef CRANE_X7_JOINT_STIFFNESS_CONTROLLER_HPP_
-#define CRANE_X7_JOINT_STIFFNESS_CONTROLLER_HPP_
+#ifndef CRANE_X7_INVERSE_DYNAMICS_CONTROLLER_HPP_
+#define CRANE_X7_INVERSE_DYNAMICS_CONTROLLER_HPP_
 
 #include <string>
 #include <vector>
@@ -21,12 +21,12 @@
 
 namespace crane_x7_ros {
 
-class CraneX7JointStiffnessController : public controller_interface::Controller<hardware_interface::EffortJointInterface> {
+class CraneX7InverseDynamicsController : public controller_interface::Controller<hardware_interface::EffortJointInterface> {
 public:
   using Vector7d = Eigen::Matrix<double, 7, 1>;
   using Matrix7d = Eigen::Matrix<double, 7, 7>;
 
-  CraneX7JointStiffnessController();
+  CraneX7InverseDynamicsController();
   bool init(hardware_interface::EffortJointInterface* hardware, 
             ros::NodeHandle& node_handler) override;
   void starting(const ros::Time& time) override;
@@ -43,10 +43,10 @@ private:
   pinocchio::Data data_;
   pinocchio::container::aligned_vector<pinocchio::Force> fjoint_;
 
-  Vector7d q_, v_, qi_, qi_max_, u_, u_max_, q_goal_;
+  Vector7d q_, v_, a_, qi_, qi_max_, u_, u_max_, q_goal_;
   Matrix7d Kq_, Kv_, Ki_; // joint stiffness
 };
 
 } // namespace crane_x7_ros
 
-#endif // CRANE_X7_JOINT_STIFFNESS_CONTROLLER_HPP_ 
+#endif // CRANE_X7_INVERSE_DYNAMICS_CONTROLLER_HPP_ 
